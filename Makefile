@@ -5,7 +5,7 @@ run:
 	go run $(MAIN)
 
 build:
-	GOOS=linux GOARCH=amd64 go build -gcflags="-l=4" -ldflags="-s -w" -o bin/$(BINARY_NAME) $(MAIN) 
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o bin/$(BINARY_NAME) $(MAIN) 
 
 test:
 	go test ./... -v
