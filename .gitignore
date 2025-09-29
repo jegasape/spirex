@@ -24,6 +24,7 @@ Thumbs.db
 *.tmp
 
 build/
+bin/
 
 *.o
 *.a
