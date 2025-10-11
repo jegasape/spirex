@@ -12,7 +12,6 @@ import (
 )
 
 func main() {
-	log.Println("Starting server...")
 
 	router := http.NewServeMux()
 
@@ -48,9 +47,11 @@ func main() {
 		})
 
 	server := http.Server{
-		Addr:    ":8080",
+		Addr:    "localhost:8080",
 		Handler: router,
 	}
+
+	log.Printf("Starting server %s...", server.Addr)
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
