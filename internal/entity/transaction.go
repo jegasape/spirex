@@ -1,6 +1,7 @@
 package entity
 
 type Detail struct {
+	Id                    int     `json:"id"`
 	Periodo               string  `json:"periodo"`
 	TipoEntidad           string  `json:"tipoentidad"`
 	Entidad               string  `json:"entidad"`
