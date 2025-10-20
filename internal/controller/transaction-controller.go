@@ -9,7 +9,9 @@ import (
 )
 
 type TransactionController interface {
-	Add(w http.ResponseWriter, r *http.Request)
+	Add(w http.ResponseWriter, r *http.Request) (bool, error)
+	Edit(w http.ResponseWriter, r *http.Request) (bool, error)
+	Delete(w http.ResponseWriter, r *http.Request) (bool, error)
 	FindAll(w http.ResponseWriter, r *http.Request)
 }
 
@@ -23,16 +25,25 @@ func New(service service.TransactionService) TransactionController {
 	}
 }
 
-func (c *controller) Add(w http.ResponseWriter, r *http.Request) {
+func (c *controller) Add(w http.ResponseWriter, r *http.Request) (bool, error) {
 	var entity entity.Detail
 	if err := json.NewDecoder(r.Body).Decode(&entity); err != nil {
 		http.Error(w, "Invalid payload...", http.StatusBadRequest)
-		return
+		return false, nil
 	}
 
 	c.service.Add(entity)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&entity)
+	return true, nil
+}
+
+func (c *controller) Edit(w http.ResponseWriter, r *http.Request) (bool, error) {
+	return true, nil
+}
+
+func (c *controller) Delete(w http.ResponseWriter, r *http.Request) (bool, error) {
+	return true, nil
 }
 
 func (c *controller) FindAll(w http.ResponseWriter, r *http.Request) {
