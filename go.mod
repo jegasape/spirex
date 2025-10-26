@@ -1,4 +1,4 @@
-module github.com/jegasape/spirex.git
+module github.com/jegasape/spirex
 
 go 1.24.5
 
