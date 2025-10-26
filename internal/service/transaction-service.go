@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/jegasape/spirex.git/internal/entity"
+	"github.com/jegasape/spirex/internal/entity"
 )
 
 type TransactionService interface {
