@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/jegasape/spirex.git/internal/entity"
-	"github.com/jegasape/spirex.git/internal/service"
+	"github.com/jegasape/spirex/internal/entity"
+	"github.com/jegasape/spirex/internal/service"
 )
 
 type TransactionController interface {
