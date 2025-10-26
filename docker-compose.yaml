@@ -36,7 +36,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
     ports:
-      - "8080:8080"
+      - "8081:8081"
     networks:
       - default
 
