@@ -1,12 +1,15 @@
-FROM golang:1.24.5-alpine3.21 AS builder
+FROM golang:1.24.5-alpine AS builder
+RUN apk add --no-cache git
 WORKDIR /server
-COPY .env ./
-COPY go.mod ./
+COPY go.mod go.sum ./
+RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o bin/spirex ./cmd/server
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o spirex ./cmd/server
 
-FROM gcr.io/distroless/base-debian12 AS runner
-WORKDIR /server
-COPY --from=builder /server/bin/spirex .
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+COPY --from=builder /server/spirex .
+COPY --from=builder /server/.env .
 EXPOSE 8081
 CMD ["./spirex"]
