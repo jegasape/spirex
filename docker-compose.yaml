@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   reverse-proxy:
     image: traefik:v3.1.0
-    command: 
+    command:
       - "--api.insecure=true"
       - "--providers.docker"
       - "--providers.docker.exposedByDefault=false"
@@ -20,15 +18,18 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "${DB_PORT}:5432"
+      - "${DB_PORT}:${DB_PORT}"
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: always
+    networks:
+      - default
 
   app:
     build: .
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
@@ -36,10 +37,16 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
     ports:
-      - "8081:8081"
+      - "${APP_PORT}:${APP_PORT}"
     networks:
       - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=PathPrefix(`/`)"
+
+networks:
+  default:
+    driver: bridge
 
 volumes:
   pgdata:
-
