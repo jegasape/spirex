@@ -9,49 +9,50 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/jegasape/spirex/internal/repository"
 )
 
 func main() {
+	log.Println("Attempting to connect to database...")
+	db, err := repository.Connection()
+	if err != nil {
+		log.Fatalf("Database connection failed: %v", err)
+	}
+	defer db.Close()
+	log.Println("Database connection established successfully!")
 
 	router := http.NewServeMux()
 
-	response := struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-	}{
-		Code:    http.StatusOK,
-		Message: http.StatusText(http.StatusOK),
-	}
+	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
 
-	router.HandleFunc("/",
-		func(w http.ResponseWriter, r *http.Request) {
+		if err := db.Ping(); err != nil {
+			http.Error(w, "Database connection lost", http.StatusServiceUnavailable)
+			return
+		}
 
-			if r.URL.Path != "/" {
-				http.NotFound(w, r)
-				return
-			}
+		response := map[string]any{
+			"status":  "healthy",
+			"service": "spirex",
+			"time":    time.Now().Format(time.RFC3339),
+		}
 
-			switch r.Method {
-			case http.MethodGet:
-				w.Header().Set("Content-type", "application/json")
-				w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		}
+	})
 
-				if err := json.NewEncoder(w).Encode(&response); err != nil {
-					http.Error(w, "Failed on response", http.StatusInternalServerError)
-				}
-
-			default:
-				http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-				return
-			}
-		})
-
-	server := http.Server{
+	server := &http.Server{
 		Addr:    ":8081",
 		Handler: router,
 	}
 
-	log.Printf("Starting server %s...", server.Addr)
+	log.Printf("Starting server on %s...", server.Addr)
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -62,14 +63,14 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	log.Println("Shutting down server...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	log.Println("Shutting down server...")
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
+
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown -> ", err.Error())
+		log.Fatalf("Server forced to shutdown: %v", err)
 	}
 
-	<-ctx.Done()
 	log.Println("Server exited gracefully")
 }
