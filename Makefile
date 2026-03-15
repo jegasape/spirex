@@ -5,10 +5,10 @@ run:
 	go run $(MAIN)
 
 up:
-	docker compose up -d
+	docker compose up -d --build
 
 down:
-	docker compose down -v --rmi all && yes | docker system prune --all
+	docker compose down -v --rmi all && docker system prune --all --volumes -f
 
 build:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o bin/$(BINARY_NAME) $(MAIN) 

@@ -10,6 +10,5 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 COPY --from=builder /server/spirex .
-COPY --from=builder /server/.env .
 EXPOSE 8081
 CMD ["./spirex"]
