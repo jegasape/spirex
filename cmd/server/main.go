@@ -36,8 +36,9 @@ func main() {
 		}
 
 		response := map[string]any{
-			"status":  "healthy",
+			"code":    http.StatusOK,
 			"service": "spirex",
+			"message": "healthy",
 			"time":    time.Now().Format(time.RFC3339),
 		}
 
