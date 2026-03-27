@@ -36,14 +36,16 @@ func main() {
 		}
 
 		response := map[string]any{
-			"status":  "healthy",
+			"code":    http.StatusOK,
 			"service": "spirex",
+			"message": "healthy",
 			"time":    time.Now().Format(time.RFC3339),
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(response); err != nil {
 			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+			return
 		}
 	})
 
