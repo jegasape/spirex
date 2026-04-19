@@ -25,3 +25,6 @@ Starts the Docker containers using `docker-compose`. This is the recommended fir
 
 ### `make down`
 Stops and removes the Docker containers and cleans up unused resources.
+
+> export GPG_TTY="$(tty)"
+> echo $GPG_TTY
